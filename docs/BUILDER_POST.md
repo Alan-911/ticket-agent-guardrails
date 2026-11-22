@@ -83,9 +83,11 @@ A few of the attacks:
 
 The most interesting result: **with the system prompt removed, Cedar fired more often (2 → 5 cases).** The model *tries* more forbidden things, and the gateway blocks them. That's what layering is for.
 
-![Agent draft with sources](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/01-agent-draft.jpg)
-![Reply-To approval denied](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/02-replyto-approval-denied.jpg)
-![Change after approval, release denied](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/04-swap-after-approval-denied.jpg)
+![Agent draft with sources](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/01-agent-draft.png)
+![Reply-To approval denied](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/03-replyto-approval-denied.png)
+![Hidden PDF injection flagged](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/07-pdf-injection-flagged.png)
+![Guardrails refusal before the model runs](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/08-guardrails-refusal.png)
+![Change after approval, release denied](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/screenshots/06-change-after-approval-denied.png)
 
 ## What broke (and how I fixed it)
 

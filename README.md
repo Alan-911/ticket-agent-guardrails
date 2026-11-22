@@ -87,8 +87,10 @@ With the prompt removed, **Cedar fired more often (2 → 5 cases)**: the model a
 
 | | |
 |---|---|
-| ![Draft](docs/screenshots/01-agent-draft.jpg) | ![Reply-To denied](docs/screenshots/02-replyto-approval-denied.jpg) |
-| ![Released](docs/screenshots/03-released-to-hot-folder.jpg) | ![Swap denied](docs/screenshots/04-swap-after-approval-denied.jpg) |
+| ![Agent draft with sources](docs/screenshots/01-agent-draft.png) | ![Agent summary vs database](docs/screenshots/02-agent-vs-database.png) |
+| ![Reply-To approval denied](docs/screenshots/03-replyto-approval-denied.png) | ![Released to hot folder](docs/screenshots/04-released-to-hot-folder.png) |
+| ![Change after approval denied](docs/screenshots/06-change-after-approval-denied.png) | ![Hidden PDF injection flagged](docs/screenshots/07-pdf-injection-flagged.png) |
+| ![Guardrails refusal](docs/screenshots/08-guardrails-refusal.png) | ![Hot folders](docs/screenshots/05-hot-folders.png) |
 
 ## Run it
 
