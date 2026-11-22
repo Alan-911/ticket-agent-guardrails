@@ -214,6 +214,7 @@ class TicketTools:
     def _save(self, specs, sources, notes, requested_discount_pct, ticket_id):
         customer_id = self._require_customer()
         self._reject_forbidden(specs)
+        specs = _blank_placeholders(specs)
 
         category = prohibited.classify(json.dumps(specs) + "\n" + self.ctx.email_text)
         if category:
@@ -282,6 +283,24 @@ class TicketTools:
             "specs": t.specs, "price": t.price, "needs_review": t.needs_review,
             "flags": [f.to_dict() for f in t.flags], "refusal": t.refusal,
         }
+
+
+PLACEHOLDERS = {"", "unknown", "n/a", "na", "tbd", "none", "null", "?", "-"}
+
+
+def _blank_placeholders(specs: dict) -> dict:
+    """BREAKLOG #14: models send 0 or "unknown" for values they don't have.
+    Those mean "not given", so treat them as empty instead of as claims needing a source."""
+    out = {}
+    for k, v in specs.items():
+        if v == 0 and not isinstance(v, bool):
+            v = None
+        elif isinstance(v, str) and v.strip().casefold() in PLACEHOLDERS:
+            v = None
+        elif isinstance(v, list):
+            v = [x for x in v if not (isinstance(x, str) and x.strip().casefold() in PLACEHOLDERS)] or None
+        out[k] = v
+    return out
 
 
 def _safe(args: dict) -> dict:

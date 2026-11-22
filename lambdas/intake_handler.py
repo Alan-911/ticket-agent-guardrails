@@ -14,13 +14,15 @@ import uuid
 from datetime import date
 
 import boto3
+from botocore.config import Config
 
 from ticket_core.ddb_store import DynamoStore
 from ticket_core.intake import Email, intake
 from ticket_core.schema import Flag, Status, Ticket
 
 bedrock = boto3.client("bedrock-runtime")
-agentcore = boto3.client("bedrock-agentcore")
+# Agent sessions can stream for minutes; the default 60 s read timeout cut some off.
+agentcore = boto3.client("bedrock-agentcore", config=Config(read_timeout=300, retries={"max_attempts": 1}))
 
 DENIED_TOPIC_CATEGORY = {
     "Counterfeit_Currency": "CURRENCY",
@@ -70,7 +72,14 @@ def apply_guardrail(text: str) -> tuple[list[Flag], str | None]:
 
 
 def handler(event, context):
-    email = Email.from_dict(event["email"])
+    # The Lambda only exposes the model override, never a system-prompt override.
+    return process(event["email"], model_id=event.get("model_id"))
+
+
+def process(email_raw: dict, model_id: str | None = None, system_prompt: str | None = None) -> dict:
+    """Intake pipeline. `system_prompt` is used only by the local red-team runner
+    (prompt-removed mode); it is not reachable through the Lambda event."""
+    email = Email.from_dict(email_raw)
     store = DynamoStore(os.environ["TABLE_NAME"], writer="tools")
     ctx = intake(email, store)
 
@@ -82,19 +91,22 @@ def handler(event, context):
     if refuse_category and ctx.customer_id:
         t = Ticket(ticket_id=store.new_ticket_id(), customer_id=ctx.customer_id, source_email_id=email.message_id,
                    specs={}, price=None, status=Status.REFUSED, flags=list(ctx.intake_flags),
-                   refusal={"category": refuse_category, "explanation": "Blocked by Bedrock Guardrails at intake; the model was not invoked."})
+                   refusal={"category": refuse_category, "explanation": "Blocked by Bedrock Guardrails at intake; the model was not invoked."},
+                   session_id=ctx.session_id)
         store.put(t)
         store.log("intake", "refuse", "DENY", "R6", "bedrock-guardrail", {"ticket_id": t.ticket_id})
         return {"email_id": email.message_id, "agent_invoked": False, "refused": refuse_category,
+                "customer_id": ctx.customer_id, "session_id": ctx.session_id,
                 "tickets": [t.ticket_id], "flags": [f.to_dict() for f in ctx.intake_flags]}
 
     token = store.put_session(ctx)
     prompt = PROMPT.format(token=token, email=ctx.email_text, today=date.today().isoformat(),
                            flags=json.dumps([f"{f.code}: {f.message}" for f in ctx.intake_flags]) or "[]")
-    model_override = event.get("model_id")
     kwargs = {}
-    if model_override:
-        kwargs["model"] = {"bedrockModelConfig": {"modelId": model_override, "maxTokens": 2048}}
+    if model_id:
+        kwargs["model"] = {"bedrockModelConfig": {"modelId": model_id, "maxTokens": 2048, "temperature": 0}}
+    if system_prompt:
+        kwargs["systemPrompt"] = [{"text": system_prompt}]
 
     resp = agentcore.invoke_harness(
         harnessArn=os.environ["HARNESS_ARN"],
@@ -102,8 +114,9 @@ def handler(event, context):
         messages=[{"role": "user", "content": [{"text": prompt}]}],
         **kwargs,
     )
-    text, tool_calls, stop = [], [], None
+    text, tool_calls, stop, events = [], [], None, []
     for ev in resp["stream"]:
+        events.append(json.dumps(ev, default=str)[:2000])
         if "contentBlockStart" in ev:
             start = ev["contentBlockStart"].get("start", {})
             if "toolUse" in start:
@@ -134,7 +147,8 @@ def handler(event, context):
         store.log("intake", "verify_agent_reply", "MISMATCH", "R9", "system-of-record-check", {"issues": mismatch})
     return {
         "email_id": email.message_id, "agent_invoked": True, "customer_id": ctx.customer_id,
-        "stop_reason": stop, "tool_calls": tool_calls,
+        "session_id": ctx.session_id, "stop_reason": stop, "tool_calls": tool_calls,
+        "gateway_denials": [e for e in events if "policy enforcement" in e or "Unknown tool" in e][:10],
         "agent_reply": reply[-4000:],
         "verified_outcome": {
             "tickets_saved_this_session": [{"ticket_id": t.ticket_id, "status": t.status.value, "specs": t.specs,

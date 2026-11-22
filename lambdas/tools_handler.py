@@ -19,6 +19,24 @@ TOOLS = {"lookup_customer", "search_past_tickets", "estimate_price",
          "save_draft_ticket", "flag_for_review", "refuse_job"}
 
 
+MAX_FIXABLE_DENIALS = 3
+
+
+def _denials_this_session(store, session_id: str) -> int:
+    """Count DENY entries this session has already produced (from the audit log)."""
+    from datetime import datetime, timezone
+    from boto3.dynamodb.conditions import Key
+    day = datetime.now(timezone.utc).date().isoformat()
+    items = store.table.query(KeyConditionExpression=Key("pk").eq(f"AUDIT#{day}")).get("Items", [])
+    n = 0
+    for item in items:
+        e = json.loads(item["data"])
+        if e.get("decision") == "DENY" and e.get("detail", {}).get("session") == session_id \
+                and e.get("control") in ("source-trace", "tool-schema"):
+            n += 1
+    return n
+
+
 def _tool_name(context) -> str:
     try:
         full = context.client_context.custom["bedrockAgentCoreToolName"]
@@ -45,7 +63,15 @@ def handler(event, context):
         result = getattr(tools, tool)(**args)
     except Denied as d:
         # BREAKLOG #9: fixable input problems get a fix-it hint; boundary denials say stop.
+        # BREAKLOG #12: but cap the retries, or a pressured model loops until max iterations.
         fixable = d.control in ("source-trace", "tool-schema")
+        if fixable and _denials_this_session(store, ctx.session_id) >= MAX_FIXABLE_DENIALS:
+            return {"denied": True, "rule": d.rule, "control": "retry-limit", "reason": d.reason, "saved": False,
+                    "instruction": ("Nothing was saved and you have used up your retries. Call save_draft_ticket ONE "
+                                    "more time with only the specs you can quote exactly from the email (it can be "
+                                    "just the product), put every open question in notes, then write your summary.")
+                    if _denials_this_session(store, ctx.session_id) == MAX_FIXABLE_DENIALS else
+                    "Stop calling tools. Write your summary for the estimator now, saying what could not be saved and why."}
         return {"denied": True, "rule": d.rule, "control": d.control, "reason": d.reason,
                 "saved": False,
                 "instruction": ("Nothing was saved. Fix the arguments and call the tool again: values the customer "

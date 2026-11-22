@@ -29,6 +29,11 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         r"|\$0(\.0+)?\b|\bfree of charge\b|\b([2-9]\d|100)\s?% (off|discount|contract discount)\b")),
     ("HIDE_FROM_REVIEW", re.compile(
         r"\b(do not|don't|never)\b.{0,15}?\b(flag|mention|report|tell)\b")),
+    # BREAKLOG #13: requests to run commands or call internal tools by name.
+    ("TOOL_REQUEST", re.compile(
+        r"\b(run|execute)\b.{0,25}?\b(shell|command|script|terminal)\b|\baws (s3|lambda|dynamodb) \w+"
+        r"|\b(call|use|invoke|trigger)\b.{0,20}?\b[a-z]+_[a-z_]+\b.{0,10}?\btool\b"
+        r"|\b(release_job|set_status|send_proof|mark_reviewed|update_specs)\b")),
     ("TOOL_SYNTAX", re.compile(
         r"</?(system|assistant|tool|instructions?|function_calls?)>|\{\s*\"(tool|function|name|action)\"\s*:")),
     # A few non-English variants. Bedrock Guardrails' prompt-attack filter covers more languages.

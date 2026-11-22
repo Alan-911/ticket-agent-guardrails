@@ -193,3 +193,12 @@ def test_R9_quantity_cannot_be_copied_from_history(session):
     with pytest.raises(Denied) as e:
         tools.save_draft_ticket({**CARDS_SPECS, "quantity": 500}, {**CARDS_SOURCES, "quantity": "ticket:T-0007"})
     assert e.value.control == "source-trace" and "specific to this order" in e.value.reason
+
+
+def test_R9_placeholder_values_mean_missing_not_claims(session):
+    # BREAKLOG #14: agent sent quantity 0 / "unknown" for an unstated value; source-trace rejected the save.
+    _, tools = session("E-003-ambiguous")
+    view = tools.save_draft_ticket({"product": "flyers", "quantity": 0, "stock": "unknown", "colors": "TBD"},
+                                   {"product": "We need flyers"})
+    assert view["status"] == "DRAFT" and view["specs"]["quantity"] is None
+    assert {"MISSING_QUANTITY", "MISSING_STOCK", "MISSING_COLORS"} <= codes(view)
