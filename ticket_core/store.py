@@ -88,6 +88,8 @@ class Store:
         if not changed:
             return t
         t.specs.update(changed)
+        for k in changed:  # the old quote no longer supports the new value
+            t.sources[k] = f"edited by {actor}"
         t.version += 1
         t.status = Status.DRAFT
         t.reviewed_by = None
