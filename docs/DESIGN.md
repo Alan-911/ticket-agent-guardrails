@@ -159,7 +159,19 @@ Everything that breaks during testing goes in [`BREAKLOG.md`](BREAKLOG.md) as it
 
 ---
 
-## 8. Schedule (deadline Dec 2, 11:59 PM PST)
+## 8. Cost plan (≈ $80 of credits)
+
+| Item | Choice | Why |
+|---|---|---|
+| Region | us-east-1 | Widest AgentCore + Bedrock model availability |
+| Knowledge Base vector store | **S3 Vectors** (not OpenSearch Serverless) | OpenSearch Serverless has an always-on minimum that would burn the budget in days |
+| Model for dev + bulk red-team runs | Claude Haiku 4.5 (`us.anthropic.claude-haiku-4-5-20251001-v1:0`) | Cheap enough for hundreds of runs |
+| Model for final demo run | Claude Sonnet 4.6 (`us.anthropic.claude-sonnet-4-6`) | Better extraction quality for screenshots/video |
+| Data | DynamoDB on-demand, S3, Lambda | Pennies at demo scale |
+| Guard | AWS Budgets alert at $20 / $40 / $60 | No surprises |
+| Teardown | `cdk destroy` after submission | Nothing left running |
+
+## 9. Schedule (deadline Dec 2, 11:59 PM PST)
 
 | Dates | Milestone |
 |---|---|

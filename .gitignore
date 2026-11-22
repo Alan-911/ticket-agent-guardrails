@@ -7,3 +7,9 @@ node_modules/
 .pytest_cache/
 redteam/results/*.json
 !redteam/results/.gitkeep
+
+# Credentials: never commit
+rootkey.csv
+*accessKeys*.csv
+*credentials*.csv
+.aws/

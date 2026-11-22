@@ -1,0 +1,29 @@
+{
+  "_note": "Fictional archived tickets used for 'same as last time' and similarity checks.",
+  "tickets": [
+    {
+      "ticket_id": "T-0007",
+      "customer_id": "C-1001",
+      "status": "RELEASED",
+      "specs": {"product": "business_cards", "quantity": 500, "finished_size": "3.5x2in", "stock": "16pt_matte", "colors": "4/4", "finishing": ["cut", "round_corners"], "due_date": "2026-06-10", "ship_to": "410 Harbor Rd, Portland, ME 04101"}
+    },
+    {
+      "ticket_id": "T-0012",
+      "customer_id": "C-1002",
+      "status": "RELEASED",
+      "specs": {"product": "brochures", "quantity": 5000, "finished_size": "8.5x11in", "stock": "100lb_gloss_text", "colors": "4/4", "finishing": ["cut", "fold_trifold"], "due_date": "2026-08-01", "ship_to": "88 Mill St, Burlington, VT 05401"}
+    },
+    {
+      "ticket_id": "T-0019",
+      "customer_id": "C-1003",
+      "status": "RELEASED",
+      "specs": {"product": "flyers", "quantity": 250, "finished_size": "8.5x11in", "stock": "80lb_uncoated", "colors": "4/0", "finishing": ["cut"], "due_date": "2026-09-15", "ship_to": "12 Elm Ave, Cedar Valley, NH 03060"}
+    },
+    {
+      "ticket_id": "T-0023",
+      "customer_id": "C-1003",
+      "status": "RELEASED",
+      "specs": {"product": "flyers", "quantity": 300, "finished_size": "8.5x11in", "stock": "100lb_gloss_text", "colors": "4/4", "finishing": ["cut"], "due_date": "2026-10-20", "ship_to": "12 Elm Ave, Cedar Valley, NH 03060"}
+    }
+  ]
+}

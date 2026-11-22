@@ -1,0 +1,73 @@
+{
+  "_note": "Fictional pricing for the demo shop. All money in US cents.",
+  "max_discount_pct": 10,
+  "min_margin_pct": 15,
+  "rush_multiplier": 1.5,
+  "products": {
+    "business_cards": {
+      "setup_cents": 1500,
+      "per_100_cents": [[1, 1200], [500, 900], [2500, 600]],
+      "cost_ratio": 0.55,
+      "min_turnaround_days": 3,
+      "stocks": ["14pt_c2s", "16pt_matte"],
+      "colors": ["4/0", "4/4", "1/0", "1/1"],
+      "finishing": ["cut", "round_corners", "lamination_matte"]
+    },
+    "flyers": {
+      "setup_cents": 2500,
+      "per_100_cents": [[1, 4500], [1000, 2800], [5000, 1400]],
+      "cost_ratio": 0.55,
+      "min_turnaround_days": 3,
+      "stocks": ["100lb_gloss_text", "80lb_uncoated"],
+      "colors": ["4/0", "4/4", "1/0", "1/1"],
+      "finishing": ["cut", "fold_half", "fold_trifold"]
+    },
+    "brochures": {
+      "setup_cents": 4000,
+      "per_100_cents": [[1, 7500], [1000, 4200], [5000, 2400]],
+      "cost_ratio": 0.55,
+      "min_turnaround_days": 5,
+      "stocks": ["100lb_gloss_text", "80lb_uncoated"],
+      "colors": ["4/4", "1/1"],
+      "finishing": ["cut", "fold_half", "fold_trifold", "saddle_stitch"]
+    },
+    "postcards": {
+      "setup_cents": 2000,
+      "per_100_cents": [[1, 3800], [1000, 2200], [5000, 1200]],
+      "cost_ratio": 0.55,
+      "min_turnaround_days": 3,
+      "stocks": ["14pt_c2s", "16pt_matte"],
+      "colors": ["4/0", "4/4"],
+      "finishing": ["cut", "round_corners", "lamination_matte"]
+    },
+    "banners": {
+      "setup_cents": 3000,
+      "per_100_cents": [[1, 450000]],
+      "cost_ratio": 0.5,
+      "min_turnaround_days": 4,
+      "stocks": ["13oz_vinyl", "fabric_polyester"],
+      "colors": ["4/0"],
+      "finishing": ["grommets", "hemmed_edges", "pole_pockets"]
+    }
+  },
+  "stock_multipliers": {
+    "14pt_c2s": 1.0,
+    "16pt_matte": 1.2,
+    "100lb_gloss_text": 1.0,
+    "80lb_uncoated": 0.92,
+    "13oz_vinyl": 1.0,
+    "fabric_polyester": 1.3
+  },
+  "color_multipliers": {"4/0": 1.0, "4/4": 1.35, "1/0": 0.7, "1/1": 0.85},
+  "finishing_per_100_cents": {
+    "cut": 0,
+    "round_corners": 400,
+    "lamination_matte": 900,
+    "fold_half": 300,
+    "fold_trifold": 500,
+    "saddle_stitch": 1500,
+    "grommets": 20000,
+    "hemmed_edges": 30000,
+    "pole_pockets": 40000
+  }
+}

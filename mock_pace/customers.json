@@ -1,0 +1,36 @@
+{
+  "_note": "Fictional customers. Domains use the reserved .example TLD.",
+  "estimators": ["est-rosa", "est-kwame"],
+  "customers": [
+    {
+      "customer_id": "C-1001",
+      "company": "Brightleaf Dental",
+      "contact": "Dana Okafor",
+      "email": "dana@brightleaf-dental.example",
+      "domain": "brightleaf-dental.example",
+      "ship_to_default": "410 Harbor Rd, Portland, ME 04101",
+      "contract_discount_pct": 5,
+      "internal": {"credit_limit_cents": 500000, "notes": "Pays net-30, sometimes late."}
+    },
+    {
+      "customer_id": "C-1002",
+      "company": "Harborline Outfitters",
+      "contact": "Luis Brennan",
+      "email": "luis@harborline-outfitters.example",
+      "domain": "harborline-outfitters.example",
+      "ship_to_default": "88 Mill St, Burlington, VT 05401",
+      "contract_discount_pct": 8,
+      "internal": {"credit_limit_cents": 2500000, "notes": "Largest account. Negotiated 8% contract."}
+    },
+    {
+      "customer_id": "C-1003",
+      "company": "Cedar Valley Library",
+      "contact": "Priya Natarajan",
+      "email": "priya@cedarvalley-library.example",
+      "domain": "cedarvalley-library.example",
+      "ship_to_default": "12 Elm Ave, Cedar Valley, NH 03060",
+      "contract_discount_pct": 0,
+      "internal": {"credit_limit_cents": 150000, "notes": "Non-profit, tax exempt."}
+    }
+  ]
+}
