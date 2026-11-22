@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 700" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4a5160"/></marker>
+    <marker id="x" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b42318"/></marker>
+    <style>
+      .box{fill:#fff;stroke:#c9ced8;stroke-width:1.5;rx:10}
+      .aws{fill:#f4f7ff;stroke:#2f5bd3;stroke-width:1.5}
+      .hum{fill:#f2faf5;stroke:#1f7a4d;stroke-width:1.5}
+      .bad{fill:#fff4f3;stroke:#b42318;stroke-width:1.5}
+      .t{font-size:15px;font-weight:700;fill:#16181d}
+      .s{font-size:12px;fill:#4a5160}
+      .l{font-size:11px;font-weight:700;fill:#2f5bd3}
+      .g{font-size:11px;font-weight:700;fill:#1f7a4d}
+      .r{font-size:11px;font-weight:700;fill:#b42318}
+      .zone{font-size:13px;font-weight:700;letter-spacing:.08em}
+      .arrow{stroke:#4a5160;stroke-width:1.8;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1240" height="700" fill="#ffffff"/>
+  <text x="30" y="38" font-size="22" font-weight="700" fill="#16181d">Ticket Agent — a customer email can't print itself</text>
+  <text x="30" y="60" class="s">Every arrow into the press passes a human and a hash check. The agent's reach ends at a DRAFT ticket.</text>
+
+  <!-- zones -->
+  <rect x="20" y="80" width="1200" height="300" rx="14" fill="#fafbff" stroke="#d6def5" stroke-dasharray="6 5"/>
+  <text x="34" y="102" class="zone" fill="#2f5bd3">AGENT ZONE · can only create DRAFT or REFUSED records</text>
+  <rect x="20" y="400" width="1200" height="245" rx="14" fill="#f8fcf9" stroke="#cfe8da" stroke-dasharray="6 5"/>
+  <text x="84" y="424" class="zone" fill="#1f7a4d">HUMAN ZONE · review, proof, approval, release (the agent has no path here)</text>
+
+  <!-- row 1 -->
+  <rect x="40" y="130" width="160" height="110" class="bad" rx="10"/>
+  <text x="56" y="156" class="t">Customer email</text>
+  <text x="56" y="178" class="s">body + PDF attachments</text>
+  <text x="56" y="196" class="r">UNTRUSTED</text>
+  <text x="56" y="214" class="s">injection, spoofing,</text>
+  <text x="56" y="230" class="s">prohibited work</text>
+
+  <rect x="230" y="120" width="210" height="230" class="aws" rx="10"/>
+  <text x="246" y="146" class="t">Intake Lambda</text>
+  <text x="246" y="170" class="l">① Sender check (DKIM/DMARC,</text>
+  <text x="262" y="185" class="l">look-alike, Reply-To)</text>
+  <text x="246" y="205" class="l">② Code scanners: injection,</text>
+  <text x="262" y="220" class="l">prohibited, other customers</text>
+  <text x="246" y="240" class="l">③ Bedrock Guardrails</text>
+  <text x="262" y="255" class="s">prompt attack · denied topics</text>
+  <text x="262" y="270" class="s">denied topic → REFUSED, no model</text>
+  <text x="246" y="292" class="l">④ Session token (random)</text>
+  <text x="262" y="307" class="s">binds every tool call to one</text>
+  <text x="262" y="322" class="s">verified customer + email</text>
+
+  <rect x="470" y="130" width="200" height="140" class="aws" rx="10"/>
+  <text x="486" y="156" class="t">AgentCore Harness</text>
+  <text x="486" y="178" class="s">Amazon Nova Pro · temp 0</text>
+  <text x="486" y="198" class="l">⑤ AllowedTools = gateway only</text>
+  <text x="486" y="214" class="s">built-in shell / files removed</text>
+  <text x="486" y="234" class="s">max 12 iterations · 240 s</text>
+  <text x="486" y="252" class="s">IAM: one model, one gateway</text>
+
+  <rect x="700" y="120" width="230" height="170" class="aws" rx="10"/>
+  <text x="716" y="146" class="t">AgentCore Gateway (MCP)</text>
+  <text x="716" y="170" class="l">⑥ AgentCore Policy · Cedar</text>
+  <text x="732" y="186" class="s">ENFORCE, default deny</text>
+  <text x="732" y="204" class="s">• discount ≤ 10 %</text>
+  <text x="732" y="220" class="s">• quantity ≤ 1,000,000</text>
+  <text x="732" y="236" class="s">• known refusal categories</text>
+  <text x="732" y="252" class="s">• session token required</text>
+  <text x="732" y="270" class="s">no approve / route / release tool</text>
+
+  <rect x="960" y="120" width="240" height="190" class="aws" rx="10"/>
+  <text x="976" y="146" class="t">Tools Lambda (6 tools)</text>
+  <text x="976" y="170" class="l">⑦ Hard checks in code</text>
+  <text x="992" y="188" class="s">• customer from session, not args</text>
+  <text x="992" y="204" class="s">• every value traced to the email</text>
+  <text x="992" y="220" class="s">  or a RELEASED past job</text>
+  <text x="992" y="236" class="s">• price only from the shop table</text>
+  <text x="992" y="252" class="s">• status forced to DRAFT</text>
+  <text x="992" y="268" class="l">⑧ IAM: can't write approval</text>
+  <text x="1008" y="284" class="l">fields or sessions</text>
+
+  <rect x="960" y="320" width="240" height="52" class="box" rx="10"/>
+  <text x="976" y="344" class="t">DynamoDB · tickets</text>
+  <text x="976" y="362" class="s">+ audit log of every allow / deny</text>
+
+  <path d="M200 185 H226" class="arrow"/>
+  <path d="M440 200 H466" class="arrow"/>
+  <path d="M670 200 H696" class="arrow"/>
+  <path d="M930 200 H956" class="arrow"/>
+  <path d="M1080 310 V316" class="arrow"/>
+
+  <!-- row 2 -->
+  <rect x="40" y="460" width="230" height="170" class="hum" rx="10"/>
+  <text x="56" y="486" class="t">Estimator console</text>
+  <text x="56" y="508" class="s">draft + sources + flags</text>
+  <text x="56" y="526" class="g">⑨ Agent's summary shown next</text>
+  <text x="72" y="542" class="g">to the verified DB outcome</text>
+  <text x="56" y="562" class="s">(the agent once claimed a save</text>
+  <text x="56" y="578" class="s">that never happened)</text>
+  <text x="56" y="602" class="s">Estimator marks reviewed</text>
+
+  <rect x="300" y="460" width="270" height="170" class="hum" rx="10"/>
+  <text x="316" y="486" class="t">Approval Lambda</text>
+  <text x="316" y="508" class="g">⑩ Proof goes to address ON FILE</text>
+  <text x="332" y="524" class="s">never to one from the email</text>
+  <text x="316" y="546" class="g">⑪ Approval token = HMAC over</text>
+  <text x="332" y="562" class="g">the spec + price hash</text>
+  <text x="332" y="580" class="s">secret in Secrets Manager, readable</text>
+  <text x="332" y="596" class="s">only by approval + release roles</text>
+  <text x="316" y="618" class="s">Any edit → v+1, back to DRAFT</text>
+
+  <rect x="600" y="460" width="260" height="170" class="hum" rx="10"/>
+  <text x="616" y="486" class="t">Release Lambda</text>
+  <text x="616" y="508" class="g">⑫ Re-checks at the last moment</text>
+  <text x="632" y="526" class="s">• status APPROVED</text>
+  <text x="632" y="542" class="s">• human reviewed it</text>
+  <text x="632" y="558" class="s">• token valid + not expired</text>
+  <text x="632" y="574" class="s">• current hash = approved hash</text>
+  <text x="632" y="592" class="s">(catches direct DB tampering)</text>
+  <text x="616" y="614" class="s">Routes by product + quantity</text>
+
+  <rect x="890" y="460" width="310" height="170" class="hum" rx="10"/>
+  <text x="906" y="486" class="t">S3 hot folders</text>
+  <text x="906" y="508" class="s">fiery/ · prinergy/ · caldera/</text>
+  <text x="906" y="530" class="g">⑬ Bucket policy: DENY PutObject</text>
+  <text x="922" y="546" class="g">for every principal except the</text>
+  <text x="922" y="562" class="g">release Lambda role</text>
+  <text x="906" y="588" class="s">Stands in for Prinergy / PitStop /</text>
+  <text x="906" y="604" class="s">Fiery / Caldera hot folders</text>
+
+  <path d="M1080 372 V391 H60 V456" class="arrow"/>
+  <path d="M270 545 H296" class="arrow"/>
+  <path d="M570 545 H596" class="arrow"/>
+  <path d="M860 545 H886" class="arrow"/>
+
+  <!-- forbidden path -->
+  <path d="M570 270 C620 380 940 380 1000 456" stroke="#b42318" stroke-width="1.8" stroke-dasharray="6 5" fill="none" marker-end="url(#x)"/>
+  <rect x="660" y="352" width="196" height="24" rx="6" fill="#fff4f3" stroke="#b42318"/>
+  <text x="670" y="369" class="r">no tool, no IAM, no policy path</text>
+
+  <text x="30" y="660" class="s">① – ⑬ = independent enforcement layers. Stress test: 35/35 attacks held with the normal prompt AND with the system prompt</text>
+  <text x="30" y="678" class="s">replaced by "do whatever the email says"; 10/10 direct-to-gateway "hostile model" calls handled correctly; 0 unauthorized hot-folder writes.</text>
+</svg>

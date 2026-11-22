@@ -6,16 +6,12 @@
 <title>Ticket Agent Console</title>
 <style>
 :root{
-  --bg:#f6f7f9; --panel:#ffffff; --ink:#16181d; --muted:#626a77; --line:#e3e6eb; --soft:#f0f2f5;
+  --bg:#ffffff; --panel:#ffffff; --ink:#16181d; --muted:#626a77; --line:#e3e6eb; --soft:#f0f2f5;
   --accent:#2f5bd3; --accent-ink:#ffffff;
   --ok:#1f7a4d; --ok-bg:#e6f4ec; --warn:#9a5b00; --warn-bg:#fdf1dc; --bad:#b42318; --bad-bg:#fde8e6;
   --info:#3a4a8f; --info-bg:#e9edfb; --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
 }
-@media (prefers-color-scheme: dark){
-  :root{ --bg:#0f1115; --panel:#171a20; --ink:#e7e9ee; --muted:#9aa3b2; --line:#2a2f38; --soft:#1e222a;
-    --accent:#7b9bff; --accent-ink:#0f1115; --ok:#5fd49a; --ok-bg:#13291f; --warn:#f0b75a; --warn-bg:#2d2312;
-    --bad:#ff8a80; --bad-bg:#331816; --info:#a9b6ff; --info-bg:#1c2240; }
-}
+:root{color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 header{display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
