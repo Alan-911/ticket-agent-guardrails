@@ -42,7 +42,7 @@
   <text x="262" y="220" class="l">prohibited, other customers</text>
   <text x="246" y="240" class="l">③ Bedrock Guardrails</text>
   <text x="262" y="255" class="s">prompt attack · denied topics</text>
-  <text x="262" y="270" class="s">denied topic → REFUSED, no model</text>
+  <text x="262" y="270" class="s">hit → REFUSED before the model</text>
   <text x="246" y="292" class="l">④ Session token (random)</text>
   <text x="262" y="307" class="s">binds every tool call to one</text>
   <text x="262" y="322" class="s">verified customer + email</text>

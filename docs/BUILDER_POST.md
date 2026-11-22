@@ -20,7 +20,7 @@ That makes it a perfect job for an agent, and a dangerous one:
 
 So I gave the agent exactly **one job**: read one email and create a **DRAFT** ticket for a human estimator. Everything after that (review, proof, approval, release) belongs to people and to deterministic code the agent can't reach.
 
-![Architecture](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/architecture.svg)
+![Architecture](https://raw.githubusercontent.com/Alan-911/ticket-agent-guardrails/main/docs/architecture.png)
 
 ## The rules
 
