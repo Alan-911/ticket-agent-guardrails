@@ -10,7 +10,7 @@
 
 I've built automation for commercial print shops. Every day, customers email sales and CSRs with requests: "1,000 business cards, same as last time", "5,000 tri-fold brochures, spec sheet attached". An estimator reads each one and re-keys it into the MIS (EFI Pace): product, quantity, size, paper, ink, finishing, due date, ship-to. From there a job ticket flows to proofing, client approval and finally a hot folder in Prinergy, PitStop, Fiery or Caldera, and a press starts running.
 
-> [Add 2–3 sentences from your own experience: a real mistake you've seen reach the press, what it cost, or how long estimators spend re-keying emails.]
+In the shops I automated, this whole front end was manual. Customer requests arrived by email to CSRs and sales, the estimator read every one, worked out the specs and the estimate, and typed them into Pace by hand to build the job ticket. After that, approval emails went to the client, and once the client approved, the ticket was routed to the right device (Prinergy, Fiery, Caldera, wide format) through PitStop hot folders. My plan was to put AI agents on every step of that chain. Building this project showed me where the line has to be: agents can take the reading and typing off the estimator, but anything that reaches a hot folder has to pass people and checks the agent can't touch.
 
 That makes it a perfect job for an agent, and a dangerous one:
 
@@ -109,7 +109,7 @@ I kept a break log from day one; it has **15 entries**. The ones I learned the m
 
 ## Why this design
 
-> [Optional: 2–3 sentences in your own words: why a print shop could actually trust this, what it would save an estimator per day, what you'd build next.]
+This is the first piece of the pipeline I originally designed. Next comes a review agent that compares each new ticket with the shop's archive of past tickets and flags errors for a human to correct, with every correction saved so the same mistake is caught next time. After that, agents that prepare the approval email and suggest the routing to Prinergy, Fiery or Caldera. Each of them gets the same treatment as this one: it can prepare and suggest, while sending, approving and releasing stay with people and with code the agent can't reach.
 
 The agent is useful because it does the tedious part: reading, extracting, comparing with history, pricing from the table, and asking questions when something is missing. It's safe because **everything that costs money or can't be undone is outside its reach**, and every boundary is enforced by something that isn't the model.
 
