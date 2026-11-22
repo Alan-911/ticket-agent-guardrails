@@ -13,3 +13,6 @@ rootkey.csv
 *accessKeys*.csv
 *credentials*.csv
 .aws/
+
+build/
+cdk-outputs.json

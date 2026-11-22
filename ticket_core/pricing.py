@@ -58,6 +58,8 @@ class PricingTable:
             due_date = date.fromisoformat(due)
         except ValueError:
             raise PricingError(f"due date '{due}' is not YYYY-MM-DD") from None
+        if due_date < today:
+            raise PricingError(f"due date {due} is in the past")
         return (due_date - today).days < self.product(product)["min_turnaround_days"]
 
     def estimate(self, specs: dict, contract_discount_pct: float, today: date) -> Estimate:

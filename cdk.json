@@ -1,0 +1,7 @@
+{
+  "app": "uv run --group infra python infra/app.py",
+  "output": "cdk.out",
+  "context": {
+    "@aws-cdk/aws-iam:minimizePolicies": true
+  }
+}

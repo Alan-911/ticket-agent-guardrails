@@ -125,6 +125,23 @@ def test_R9_value_not_in_email_is_rejected(session):
         tools.save_draft_ticket(CARDS_SPECS, {**CARDS_SOURCES, "stock": "premium silk laminate"})
 
 
+def test_R9_guessed_year_is_rejected(session):
+    # BREAKLOG #7: live run saved "December 12" as 2023-12-12 and got rush pricing.
+    _, tools = session("E-001-benign-cards")
+    with pytest.raises(Denied) as e:
+        tools.save_draft_ticket({**CARDS_SPECS, "due_date": "2023-12-12"}, CARDS_SOURCES)
+    assert e.value.control == "source-trace" and "2026-12-12" in e.value.reason
+
+
+def test_R9_past_due_date_blocks_instead_of_rush(session, emails):
+    raw = dict(emails["E-001-benign-cards"])
+    raw["body"] = raw["body"].replace("December 12", "2026-11-01")
+    _, tools = session(raw)
+    view = tools.save_draft_ticket({**CARDS_SPECS, "due_date": "2026-11-01"},
+                                   {**CARDS_SOURCES, "due_date": "2026-11-01"})
+    assert view["price"] is None and "DUE_DATE_PAST" in codes(view)
+
+
 def test_R9_ambiguous_email_produces_questions_not_guesses(session):
     _, tools = session("E-003-ambiguous")
     view = tools.save_draft_ticket({"product": "flyers"}, {"product": "We need flyers"})
@@ -158,3 +175,21 @@ def test_denials_are_audited_with_rule_and_control(session, store):
         tools.lookup_customer("C-1002")
     last = store.audit[-1]
     assert (last["decision"], last["rule"], last["control"]) == ("DENY", "R2", "tool-customer-scope")
+
+
+def test_R9_unreviewed_draft_cannot_seed_new_tickets(session):
+    # BREAKLOG #10: a live run copied "our usual" specs from an earlier unreviewed draft.
+    _, tools = session("E-001-benign-cards")
+    draft = tools.save_draft_ticket(CARDS_SPECS, CARDS_SOURCES)["ticket_id"]
+    assert draft not in {t["ticket_id"] for t in tools.search_past_tickets()}
+    with pytest.raises(Denied) as e:
+        tools.save_draft_ticket(CARDS_SPECS, {**CARDS_SOURCES, "stock": f"ticket:{draft}"})
+    assert e.value.control == "source-trace" and "unreleased" in e.value.reason
+
+
+def test_R9_quantity_cannot_be_copied_from_history(session):
+    # BREAKLOG #11: email said 1,000; agent copied 500 from T-0007 with a ticket: source.
+    _, tools = session("E-001-benign-cards")
+    with pytest.raises(Denied) as e:
+        tools.save_draft_ticket({**CARDS_SPECS, "quantity": 500}, {**CARDS_SOURCES, "quantity": "ticket:T-0007"})
+    assert e.value.control == "source-trace" and "specific to this order" in e.value.reason

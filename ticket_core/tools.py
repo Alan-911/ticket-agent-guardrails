@@ -31,6 +31,8 @@ FORBIDDEN_KEYS = {
 REFUSAL_CATEGORIES = {"CURRENCY", "GOVERNMENT_ID", "NEGOTIABLE_INSTRUMENT", "COUNTERFEIT_BRAND", "HATEFUL", "OTHER"}
 UNUSUAL_QTY_FACTOR = 5
 ARCHIVE_SOURCE = re.compile(r"^ticket:(T-\d{4})$")
+# BREAKLOG #11: history may supply product specs, never per-order values.
+ORDER_SPECIFIC = {"quantity", "due_date"}
 
 AGENT = "ticket-agent"
 
@@ -75,7 +77,10 @@ class TicketTools:
         """Add a question or concern for the estimator on one of this session's tickets."""
         def go():
             t = self._own_ticket(ticket_id)
+            if t.status != Status.DRAFT:
+                raise Denied("R3", "tool-status-guard", "agent may only annotate drafts")
             t.flags.append(Flag("AGENT_NOTE", message[:500], "R9", raised_by="agent"))
+            self.store.put(t)
             return self._view(t)
         return self._run("flag_for_review", {"ticket_id": ticket_id, "message": message}, go)
 
@@ -87,7 +92,7 @@ class TicketTools:
             t = Ticket(ticket_id=self.store.new_ticket_id(), customer_id=self.ctx.customer_id,
                        source_email_id=self.ctx.email_id, specs={}, price=None, status=Status.REFUSED,
                        refusal={"category": cat, "explanation": explanation[:1000]},
-                       flags=list(self.ctx.intake_flags))
+                       flags=list(self.ctx.intake_flags), session_id=self.ctx.session_id)
             self.store.put(t)
             return self._view(t)
         return self._run("refuse_job", {"category": category}, go)
@@ -121,8 +126,10 @@ class TicketTools:
 
     def _search(self, product, customer_id):
         self._check_scope(customer_id)
+        # BREAKLOG #10: only human-approved, released jobs count as history. Unreviewed
+        # drafts (possibly built from a malicious email) must never seed new tickets.
         tickets = [t for t in self.store.tickets_for(self.ctx.customer_id)
-                   if t.status != Status.REFUSED and (product is None or t.specs.get("product") == product)]
+                   if t.status == Status.RELEASED and (product is None or t.specs.get("product") == product)]
         tickets.sort(key=lambda t: t.ticket_id, reverse=True)
         return [{"ticket_id": t.ticket_id, "status": t.status.value, "specs": t.specs} for t in tickets[:10]]
 
@@ -152,7 +159,8 @@ class TicketTools:
         try:
             est = self.pricing.estimate(specs, customer.contract_discount_pct, self.today())
         except PricingError as e:
-            return None, [Flag("UNPRICEABLE", str(e), "R5")]
+            code = "DUE_DATE_PAST" if "in the past" in str(e) else "UNPRICEABLE"
+            return None, [Flag(code, str(e), "R9" if code == "DUE_DATE_PAST" else "R5")]
         return est, est.flags
 
     def _check_sources(self, specs: dict, sources: dict) -> None:
@@ -163,10 +171,15 @@ class TicketTools:
             if not src or not isinstance(src, str):
                 raise Denied("R9", "source-trace", f"'{key}' has no source; values must come from the email or a past ticket")
             archived = ARCHIVE_SOURCE.match(src.strip())
+            if archived and key in ORDER_SPECIFIC:
+                raise Denied("R9", "source-trace",
+                             f"'{key}' is specific to this order and must be quoted from the email, not copied from {src}")
             if archived:
                 past = self.store.ticket(archived.group(1))
                 if past is None or past.customer_id != self.ctx.customer_id:
                     raise Denied("R2", "tool-customer-scope", f"source {src} is not one of this customer's tickets")
+                if past.status != Status.RELEASED:
+                    raise Denied("R9", "source-trace", f"{src} is an unreleased {past.status.value} ticket; only released jobs can be used as history")
                 if past.specs.get(key) != value:
                     raise Denied("R9", "source-trace", f"'{key}' does not match {src}")
                 continue
@@ -175,6 +188,28 @@ class TicketTools:
                 raise Denied("R9", "source-trace", f"quote for '{key}' is not in the email")
             if key == "quantity" and str(value) not in re.sub(r"[^\d]", "", quote):
                 raise Denied("R9", "source-trace", f"quantity {value} does not appear in its quote")
+            if key == "due_date":
+                self._check_due_year(str(value), quote)
+
+    def _check_due_year(self, value: str, quote: str) -> None:
+        """BREAKLOG #7: 'December 12' was saved as 2023-12-12. A year the email
+        doesn't state must be the next upcoming occurrence, not a guess."""
+        try:
+            due = date.fromisoformat(value)
+        except ValueError:
+            raise Denied("R9", "source-trace", f"due_date '{value}' must be YYYY-MM-DD") from None
+        stated = re.findall(r"\b(20\d{2})\b", quote)
+        if stated:
+            if str(due.year) not in stated:
+                raise Denied("R9", "source-trace", f"due_date year {due.year} is not the year in the email")
+            return
+        today = self.today()
+        expected = due.replace(year=today.year)
+        if expected < today:
+            expected = expected.replace(year=today.year + 1)
+        if due != expected:
+            raise Denied("R9", "source-trace",
+                         f"the email gives no year; '{value}' should be the next upcoming date, {expected.isoformat()}")
 
     def _save(self, specs, sources, notes, requested_discount_pct, ticket_id):
         customer_id = self._require_customer()
@@ -225,7 +260,8 @@ class TicketTools:
         else:
             t = Ticket(ticket_id=self.store.new_ticket_id(), customer_id=customer_id,
                        source_email_id=self.ctx.email_id, specs=clean,
-                       price=est.as_price() if est else None, flags=flags, sources=dict(sources))
+                       price=est.as_price() if est else None, flags=flags, sources=dict(sources),
+                       session_id=self.ctx.session_id)
         # Forced by code regardless of anything above:
         t.status = Status.DRAFT
         t.tainted = t.tainted or self.ctx.tainted

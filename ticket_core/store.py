@@ -63,6 +63,9 @@ class Store:
     def customer(self, customer_id: str) -> Customer:
         return self.customers[customer_id]
 
+    def all_customers(self) -> list[Customer]:
+        return list(self.customers.values())
+
     # tickets
     def new_ticket_id(self) -> str:
         self._next += 1

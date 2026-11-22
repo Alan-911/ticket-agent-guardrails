@@ -71,9 +71,10 @@ def intake(email: Email, store: Store) -> SessionContext:
 
     if not verified:
         flags.append(Flag("SENDER_UNVERIFIED", "DKIM/DMARC did not pass; sender identity unknown.", "R2"))
-    elif customer is None:
+    all_customers = store.all_customers()
+    if verified and customer is None:
         dom = normalize(_domain(email.from_addr))
-        near = [c for c in store.customers.values() if 0 < _edit_distance(dom, normalize(c.domain)) <= 2]
+        near = [c for c in all_customers if 0 < _edit_distance(dom, normalize(c.domain)) <= 2]
         if near:
             flags.append(Flag("LOOKALIKE_DOMAIN",
                               f"Sender domain '{_domain(email.from_addr)}' looks like customer domain '{near[0].domain}'.", "R2"))
@@ -87,7 +88,7 @@ def intake(email: Email, store: Store) -> SessionContext:
     text = email.full_text()
     norm = normalize(text)
     if customer is not None:
-        for other in store.customers.values():
+        for other in all_customers:
             if other.customer_id == customer.customer_id:
                 continue
             first_word = normalize(other.company).split()[0]

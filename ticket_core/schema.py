@@ -25,7 +25,7 @@ REQUIRED_SPECS = ("product", "quantity", "finished_size", "stock", "colors")
 PRICE_FIELDS = ("list_cents", "discount_pct", "total_cents", "unit_cents", "rush")
 
 # Codes that stop a proof from being sent until a person resolves them.
-BLOCKING_FLAG_PREFIXES = ("MISSING_", "UNPRICEABLE", "SENDER_", "LOOKALIKE_")
+BLOCKING_FLAG_PREFIXES = ("MISSING_", "UNPRICEABLE", "SENDER_", "LOOKALIKE_", "DUE_DATE_PAST")
 
 
 @dataclass
@@ -56,9 +56,23 @@ class Ticket:
     approved_hash: str | None = None
     approved_version: int | None = None
     refusal: dict | None = None
+    session_id: str | None = None  # the intake session that created it
 
     def blocking_flags(self) -> list[Flag]:
         return [f for f in self.flags if f.code.startswith(BLOCKING_FLAG_PREFIXES)]
+
+
+def ticket_to_dict(t: Ticket) -> dict:
+    d = asdict(t)
+    d["status"] = t.status.value
+    return d
+
+
+def ticket_from_dict(d: dict) -> Ticket:
+    d = dict(d)
+    d["status"] = Status(d["status"])
+    d["flags"] = [Flag(**f) for f in d.get("flags") or []]
+    return Ticket(**d)
 
 
 def spec_hash(ticket: Ticket) -> str:
