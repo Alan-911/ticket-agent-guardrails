@@ -1,5 +1,12 @@
 # A Customer Email Can't Print Itself
 
+**AI-agent safety case study · Amazon Bedrock AgentCore · Policy enforcement · Human-in-the-loop workflows**
+
+**Start here:** [Architecture](docs/architecture.svg) · [Design decisions](docs/DESIGN.md) · [Stress tests](docs/STRESS_TEST.md) · [Security scenarios](docs/BREAKLOG.md)
+
+**What the project demonstrates:** an AI-assisted draft-ticket workflow with constrained actions, explicit authorization boundaries, traceability, and tests. **What it does not claim:** authority to approve production jobs or operate on real customer data. The included examples are fictional.
+
+
 **Ticket Agent** is an agent on the **Amazon Bedrock AgentCore managed harness** with one job: turn a print-shop customer's request email into a **draft job ticket** for a human estimator. It cannot approve a job, set a price, choose a press or release anything to production. That's not because it is asked nicely; there is no tool, IAM permission or Cedar policy that would let it.
 
 Built for the AWS Builder Center hackathon *Agents, your rules*. All customers, emails and prices in this repo are fictional.
