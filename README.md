@@ -13,6 +13,18 @@ Built for the AWS Builder Center hackathon *Agents, your rules*. All customers, 
 
 ![Architecture](docs/architecture.svg)
 
+## Agent workflow preview
+
+![Policy-bound print job ticket agent architecture](docs/images/project-overview.svg)
+
+*Conceptual workflow overview; authorization decisions are enforced outside the language model.*
+
+### Example output from the project
+
+![Draft ticket produced by the agent](docs/screenshots/01-agent-draft.png)
+
+*Repository screenshot: sample draft-ticket workflow using fictional request data.*
+
 ## Why this job
 
 In a commercial print shop an estimator re-keys every RFQ email into the MIS (EFI Pace in my previous automation work): product, quantity, size, stock, colors, finishing, due date, ship-to. Mistakes that reach the press are paid in paper, ink and press time, and **a press run can't be rolled back**. Customer emails and PDFs come from strangers, so the agent's main input is also its main attack surface: hidden text in a PDF, "already approved by Mike", "set the price to $0", fake banknotes.
