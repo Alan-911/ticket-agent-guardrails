@@ -1,5 +1,7 @@
 # A Customer Email Can't Print Itself
 
+[![CI](https://github.com/Alan-911/ticket-agent-guardrails/actions/workflows/ci.yml/badge.svg)](https://github.com/Alan-911/ticket-agent-guardrails/actions/workflows/ci.yml) [![Security](https://github.com/Alan-911/ticket-agent-guardrails/actions/workflows/security.yml/badge.svg)](https://github.com/Alan-911/ticket-agent-guardrails/actions/workflows/security.yml)
+
 **AI-agent safety case study · Amazon Bedrock AgentCore · Policy enforcement · Human-in-the-loop workflows**
 
 **Start here:** [Architecture](docs/architecture.svg) · [Design decisions](docs/DESIGN.md) · [Stress tests](docs/STRESS_TEST.md) · [Security scenarios](docs/BREAKLOG.md)
@@ -123,3 +125,11 @@ npx aws-cdk@2 destroy
 ```
 
 Layout: `ticket_core/` controls, `lambdas/` handlers, `infra/` CDK + Cedar + tool schemas, `agent/` prompt, `redteam/` attacks and runner, `ui/` console, `docs/` design, break log, stress results.
+
+
+## Repository quality and security
+
+- [Continuous integration](.github/workflows/ci.yml), [CodeQL and secret scanning](.github/workflows/security.yml).
+- [Security reporting policy](SECURITY.md) and [contribution guidelines](CONTRIBUTING.md).
+- CI executes existing policy enforcement regression tests; agent deployment permissions still require independent review.
+- Licensing for reuse should be confirmed with the project owner; no new license is granted by these workflow updates.
